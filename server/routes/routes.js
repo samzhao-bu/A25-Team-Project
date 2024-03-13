@@ -43,9 +43,9 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
         }, 'pdf').then(function(result) {
             // get converted file url
             console.log("Converted file url: " + result.file.url);
-           // converted = result.files[0].fileInfo.FileName;
+            // converted = result.files[0].fileInfo.FileName;
             // save to file
-            result.saveFiles('./temp/').then(() => {
+            // result.saveFiles('./temp/').then(() => {
                 // Once saved, delete the original uploaded file
                 fs.unlink(filePath, (err) => {
                     if (err) {
@@ -54,7 +54,7 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
                         console.log('Uploaded file deleted successfully');
                     }
                 });
-            });
+            // });
         });
 
 

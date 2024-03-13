@@ -7,10 +7,7 @@ const dataShema = new mongoose.Schema({
         required: true,
         type: String
     },
-    convertedFormat: {
-        required: true,
-        type: String
-    },
+   
     originalFormat: {
         required: true,
         type: String
