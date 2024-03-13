@@ -5,19 +5,19 @@ const mongoose = require('mongoose');
 const dataShema = new mongoose.Schema({
     originalName: {
         required: true,
-        type: string
-    },
-    convertedName: {
-        required: true,
-        type: string
-    },
-    originalFormat: {
-        required: true,
-        type: string
+        type: String
     },
     convertedFormat: {
         required: true,
-        type: string
+        type: String
+    },
+    originalFormat: {
+        required: true,
+        type: String
+    },
+    convertedFormat: {
+        required: true,
+        type: String
     }
 
 
