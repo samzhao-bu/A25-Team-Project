@@ -36,14 +36,20 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
         }
 
         const filePath = req.file.path;
+
+        let convertedFilePath;
+
          // Perform the conversion
          
          convertapi.convert('docx', {
             File: filePath
         }, 'pdf').then(function(result) {
             // get converted file url
-            console.log("Converted file url: " + result.file.url);
+            // console.log("Converted file url: " + result.file.url);
+            convertedFilePath = result.file.url;
+            
             // converted = result.files[0].fileInfo.FileName;
+
             // save to file
             // result.saveFiles('./temp/').then(() => {
                 // Once saved, delete the original uploaded file
@@ -57,7 +63,7 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
             // });
         });
 
-
+        console.log(convertedFilePath);
         const data = new Model({
             originalName: req.file.originalname,
             originalFormat: 'pdf',
@@ -68,7 +74,14 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
         // Save the record in the database
         await data.save();
 
-        res.status(200).json(data);
+        res.status(200).json({
+            message: 'File converted successfully',
+            data: data,
+            // Send the URL back to the client
+            convertedFileUrl: convertedFilePath 
+        });
+
+        
         
     } catch (error) {
         console.error(error);
