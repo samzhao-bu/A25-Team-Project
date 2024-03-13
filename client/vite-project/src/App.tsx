@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navigation from './components/Navigation';
+import HomePage from './components/HomePage';
+import AnotherPage from './components/AnotherPage';
 
 function App() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    fetch("http://localhost:8000/message")
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message));
-  }, []);
-
   return (
-    <div className="App">
-      <h1>{message}</h1>
-    </div>
+    <Router>
+      <Navigation /> {/* Use the Navigation component */}
+      <div>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/another-page" element={<AnotherPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
-export default App
+export default App;
