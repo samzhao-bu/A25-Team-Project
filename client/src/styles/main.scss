@@ -25,6 +25,11 @@ h1 {
     display: flex; /* Use flexbox */
     justify-content: flex-end; /* Align items to the right */
     padding-right: 30px; 
+    position: fixed; /* Fix the position relative to the viewport */
+    top: 0; /* Align to the top of the viewport */
+    left: 0; /* Align to the left of the viewport */
+    width: 100%; /* Ensure it spans the full width */
+    z-index: 1000; /* Make sure it stays on top of other content */
   }
   
   /* Style the links inside the navigation bar */
@@ -35,12 +40,19 @@ h1 {
     padding: 25px 20px;
     text-decoration: none;
     font-size: 20px;
+    
   }
   
+  /* Change the color of links on hover */
+  .topnav a:hover {
+    color: #d00a07;
+  }
+
 
   /* Add a color to the active/current link */
   .topnav a.active {
     background-color: #d00a07;
     color: white;
+    
   }
 

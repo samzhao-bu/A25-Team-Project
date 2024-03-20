@@ -6,9 +6,10 @@ services:
       - "3000:3000" 
     volumes:
       - ./server:/usr/src/app 
+      #- E:\STUDY\2024 Spring\CS411\A25-Team-Project\client:\app
     environment:
       - NODE_ENV=production 
-      
+
       
   client: 
     build: ./client 
