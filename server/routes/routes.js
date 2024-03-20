@@ -63,7 +63,6 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
             // });
         });
 
-        console.log(convertedFilePath);
         const data = new Model({
             originalName: req.file.originalname,
             originalFormat: 'pdf',
