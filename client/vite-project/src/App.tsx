@@ -1,21 +1,29 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navigation from './components/Navigation';
-import HomePage from './components/HomePage';
-import AnotherPage from './components/AnotherPage';
+import "../src/styles/main.scss";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Fileconvert from "./pages/Fileconvert";
+import Translator from "./pages/Translator";
+import User from "./pages/User";
+import Navigation from "./components/Navigation";
+//import Sidebar from "./components/Sidebar";
 
 function App() {
-  return (
-    <Router>
-      <Navigation /> {/* Use the Navigation component */}
-      <div>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/another-page" element={<AnotherPage />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+    return (
+        <Router>
+            <div className="App">
+                <Navigation />
+                <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    
+                    <Route path="/fileconvert" element={<Fileconvert />} />
+                    
+                    <Route path="/translator" element={<Translator />} />
+
+                    <Route path="/user" element={<User />} />
+                </Routes>
+            </div>
+        </Router>
+    );
 }
 
 export default App;
