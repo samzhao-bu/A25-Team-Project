@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 // import the model
 const Model = require('../model/model');
-// import api for converting file
+// import api for converting pdf-to-docx
 var convertapi = require('convertapi')('sqnUSLzN2sMxQu0v');
 // for handling file uploads
 const multer = require('multer');
@@ -36,8 +36,6 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
         }
 
         const filePath = req.file.path;
-
-        let convertedFilePath;
 
          // Perform the conversion
          
@@ -73,7 +71,7 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
                 }
             });   
         });
-        
+
     } catch (error) {
         console.error(error);
         res.status(500).send('Error during conversion');
