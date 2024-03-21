@@ -3,7 +3,7 @@ import React from 'react';
 import FileUpload from '../components/FileUpload'; 
 
 
-const FileConverter: React.FC = () => {
+const FileConvert: React.FC = () => {
     // FileUpload component contains all the logic
     return (
         <div>
@@ -15,4 +15,4 @@ const FileConverter: React.FC = () => {
     );
 };
 
-export default FileConverter;
+export default FileConvert;
