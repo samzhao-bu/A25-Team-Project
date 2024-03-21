@@ -41,46 +41,38 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
 
          // Perform the conversion
          
-         convertapi.convert('docx', {
-            File: filePath
-        }, 'pdf').then(function(result) {
-            // get converted file url
-            // console.log("Converted file url: " + result.file.url);
-            convertedFilePath = result.file.url;
-            
-            // converted = result.files[0].fileInfo.FileName;
+         convertapi.convert('docx', {File: filePath}, 'pdf').then(async (result) => {
+            // ensure save the data to the database is executed only after the file conversion is complete and convertedFilePath is set
+            const convertedFilePath = result.file.url;
 
-            // save to file
-            // result.saveFiles('./temp/').then(() => {
-                // Once saved, delete the original uploaded file
-                fs.unlink(filePath, (err) => {
-                    if (err) {
-                        console.error('Error deleting the uploaded file:', err);
-                    } else {
-                        console.log('Uploaded file deleted successfully');
-                    }
-                });
-            // });
+            // Save to database
+            const data = new Model({
+                originalName: req.file.originalname,
+                originalFormat: 'pdf',
+                convertedFormat: 'docx',
+                // Send the URL back to the client
+                convertedFileUrl: convertedFilePath
+            });
+
+            // Save the record in the database
+            await data.save();
+
+            // Send the response to the frontend
+            res.status(200).json({
+                message: 'File converted successfully',
+                data: data
+             });  
+             
+             
+            // Once saved, delete the original uploaded file
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Error deleting the uploaded file:', err);
+                } else {
+                     console.log('Uploaded file deleted successfully');
+                }
+            });   
         });
-
-        const data = new Model({
-            originalName: req.file.originalname,
-            originalFormat: 'pdf',
-            convertedFormat: 'docx'
-        });
-
-
-        // Save the record in the database
-        await data.save();
-
-        res.status(200).json({
-            message: 'File converted successfully',
-            data: data,
-            // Send the URL back to the client
-            convertedFileUrl: convertedFilePath 
-        });
-
-        
         
     } catch (error) {
         console.error(error);

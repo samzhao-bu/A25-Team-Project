@@ -15,6 +15,10 @@ const dataShema = new mongoose.Schema({
     convertedFormat: {
         required: true,
         type: String
+    },
+    convertedFileUrl: {
+        required: true,
+        type: String
     }
 
 
