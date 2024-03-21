@@ -1,26 +1,23 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState} from 'react';
 // interface with a REST API
 import axios from 'axios';
+import FileDownload from './FileDownload'
 
-// interface used to connect to Fileconvert.tsx
-interface FileUploadProps {
-    onUploadSuccess: (convertedFileUrl: string) => void;
-    onUploadError: (error: string) => void;
-}
-
-
-const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess, onUploadError }) => {
+const FileUpload = () => {
     // set useState initialize to null
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     // if there is file uploaded, change the state
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setSelectedFile(event.target.files[0]);
-    }
-};
+        if (event.target.files) {
+            setSelectedFile(event.target.files[0]);
+        }
+    };
+
+    const [downloadUrl, setDownloadUrl] = useState('');
+    const [showDownloadButton, setShowDownloadButton] = useState(false);
 
     // triggered when use click the button to upload file
-    const handleFileUpload = useCallback(async () => {
+    const handleFileUpload = async () => {
     // if the state shows has file
     if (selectedFile) {
         // FormData constructs a set of key/value pairs representing form fields and their values
@@ -29,31 +26,33 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess, onUploadError 
 
         try {
             // use axios to perform an HTTP POST request
-            const response = await axios.post('http://localhost:3000/api/pdf-to-docx', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            // if has reply and has data
+            const response = await axios.post('http://localhost:3000/api/pdf-to-docx', formData,);
+            // if has reply and has data, we put the url into the downloadUrl var
             if (response.status === 200 && response.data) {
                 // need to be data.data.
-                onUploadSuccess(response.data.data.convertedFileUrl);
+                setDownloadUrl(response.data.data.convertedFileUrl);
+                // change the state to show the button
+                setShowDownloadButton(true);
             } else {
-                onUploadError('File conversion was unsuccessful.');
+            console.error('File conversion was unsuccessful.');
             }
         } catch (error) {
-            onUploadError( 'An error occurred during file upload.');
+            console.error( 'An error occurred during file upload.');
         }
     }
-  }, [selectedFile, onUploadSuccess, onUploadError]);
+  };
 
   return (
     <div>
         <input type="file" onChange={handleFileChange} />
         
         <button onClick={handleFileUpload} disabled={!selectedFile}>
-            Upload and Convert File
+            Upload File
         </button>
+        
+        {showDownloadButton && (
+                <FileDownload downloadUrl={downloadUrl}/>
+            )}
     </div>
   );
 };
