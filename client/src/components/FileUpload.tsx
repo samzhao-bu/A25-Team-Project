@@ -43,13 +43,13 @@ const FileUpload = () => {
   };
 
   return (
-    <div>
+    <div className="container">
         <input type="file" onChange={handleFileChange} />
         
         <button onClick={handleFileUpload} disabled={!selectedFile}>
             Upload File
         </button>
-        
+
         {showDownloadButton && (
                 <FileDownload downloadUrl={downloadUrl}/>
             )}

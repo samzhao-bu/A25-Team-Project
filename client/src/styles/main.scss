@@ -56,3 +56,57 @@ h1 {
     
   }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  text-align: center;
+  gap: 10px; 
+}
+
+  button {
+    padding: 15px 30px; /* Larger padding for a larger button */
+    font-size: 18px; /* Larger font size */
+    border-radius: 8px; /* Rounded corners */
+    border: none; /* No border */
+    cursor: pointer; /* Cursor indicates clickable item */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    background-color: #444; /* Button color */
+    color: white; /* Text color */
+    
+    /* Adjust width as necessary, or remove if you want the button's width to fit its content */
+    width: 200px;
+  }
+
+  h2 {
+    margin-top: 200px;
+    margin-left: 1%;
+    font-size: 40px; /* Increase the font size */
+    /*'viewport width 100%*/
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input[type="file"] {
+    margin-left: 6%; 
+    margin-bottom: 50px;
+    margin-top: 300px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    
+}
+
+button:hover {
+  background-color: #d00a07; /* Change background color on hover */
+}
+
+@media (max-width: 768px) {
+  .button-container {
+      width: 100%;         /* Full width on smaller screens */
+      padding: 0 20px;     /* Padding to ensure some space at the edges */
+  }
+}

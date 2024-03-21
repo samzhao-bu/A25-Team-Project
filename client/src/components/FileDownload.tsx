@@ -14,9 +14,11 @@ const FileDownload: React.FC<FileDownloadProps> = ({ downloadUrl}) => {
         link.remove();
     };
 
+    // return a button that as user clicks on it, it will start to download file
     return (
-        // return a button that as user clicks on it, it will start to download file
-        <button onClick={handleDownload}>Download File</button>
+        <div className="container">
+            <button onClick={handleDownload}>Download File</button>
+        </div>
     );
 };
 

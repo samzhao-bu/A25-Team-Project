@@ -1,5 +1,6 @@
 // if import the css in style, cannot update in docker
-import "/dist/assets/index-Be3pdj7F.css";
+// import "/dist/assets/index-Be3pdj7F.css";
+import "./styles/main.scss"
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
