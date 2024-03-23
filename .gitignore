@@ -17,3 +17,7 @@ build/
 
 # OS specific
 .DS_Store
+
+config
+
+/config/
