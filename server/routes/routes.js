@@ -17,7 +17,7 @@ const fs = require('fs');
 const bcrypt = require("bcrypt");
 // for generating token
 const jwt = require("jsonwebtoken");
-
+const auth = require("./auth");
 
 
 // Configure multer
@@ -184,6 +184,16 @@ router.post("/login", (request, response) => {
       });
   });
   
+
+// free endpoint
+router.get("/free-endpoint", (request, response) => {
+  response.json({ message: "You are free to access me anytime" });
+});
+
+// authentication endpoint
+router.get("/auth-endpoint", auth, (request, response) => {
+  response.json({ message: "You are authorized to access me" });
+});
 
 
 
