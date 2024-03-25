@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SignInForm from "../components/SignIn";
 import SignUpForm from "../components/SignUp";
 
-const Authpage = () => {
+const Authpage = ({ onAuthenticate }: { onAuthenticate: (isAuth: boolean) => void }) => {
     const [type, setType] = useState("signIn");
     const handleOnClick = (text: React.SetStateAction<string>) => {
         if (text !== type) {
@@ -17,7 +17,8 @@ const Authpage = () => {
         <h2>Sign in/up Form</h2>
         <div className={containerClass} id="container">
             <SignUpForm />
-            <SignInForm />
+            {/*pass in the func */}
+            <SignInForm onAuthenticate={onAuthenticate} />
             <div className="overlay-container">
             <div className="overlay">
                 <div className="overlay-panel overlay-left">

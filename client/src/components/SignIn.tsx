@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import axios, { AxiosError } from "axios";
-
+import { useNavigate } from 'react-router-dom';
 
 interface ServerResponse {
   message: string;
@@ -10,7 +10,10 @@ interface ServerResponse {
 }
 
 
-function SignInForm() {
+function SignInForm({ onAuthenticate }: { onAuthenticate: (isAuth: boolean) => void }) {
+
+  const navigate = useNavigate();
+
   const [state, setState] = React.useState({
     email: "",
     password: ""
@@ -43,6 +46,11 @@ function SignInForm() {
       });
 
       alert(`${response.data.message}`);
+
+      // set authenticated state to true used the func in arg
+      onAuthenticate(true);
+      // navigate to homepage
+      navigate('/');
       
     } catch (error) {
       if (axios.isAxiosError(error)) {

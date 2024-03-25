@@ -17,7 +17,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 
 function App() {
+
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // handle authentication state change
+    const handleAuthentication = (isAuth: boolean) => {
+        setIsAuthenticated(isAuth);
+      };
 
     return (
         <Router>
@@ -27,7 +32,8 @@ function App() {
                 <Routes>
                     {/*if not authenticated, will force to go back to authpage */}
                     <Route path="/" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Dashboard /></ProtectedRoute>} />
-                    <Route path="/auth" element={<Authpage />} />
+                    {/*pass in the func */}
+                    <Route path="/auth" element={<Authpage onAuthenticate={handleAuthentication}/>} />
                     <Route path="/fileconvert" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Fileconvert /></ProtectedRoute>} />
                     <Route path="/translator" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Translator /></ProtectedRoute>} />
                     <Route path="/user" element={<ProtectedRoute isAuthenticated={isAuthenticated}><User /></ProtectedRoute>} />
