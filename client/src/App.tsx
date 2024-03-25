@@ -1,6 +1,6 @@
 // if import the css in style, cannot update in docker
 // import "/dist/assets/index-Be3pdj7F.css";
-import "./styles/main.scss"
+import "./styles/style.css"
 
 import { useState} from 'react';
 
@@ -17,7 +17,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     return (
         <Router>
