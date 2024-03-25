@@ -153,8 +153,8 @@ router.post("/register", (request, response) => {
 // post endpoint for login
 router.post("/login", (request, response) => {
     // check if email exists
-    User.findOne({ email: request.body.email })
-  
+    User
+      .findOne({ email: request.body.email })
       // if email exists
       .then((user) => {
         // compare the password entered and the hashed password found

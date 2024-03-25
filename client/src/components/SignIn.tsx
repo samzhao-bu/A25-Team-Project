@@ -1,6 +1,13 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
+import axios, { AxiosError } from "axios";
+
+
+interface ServerResponse {
+  message: string;
+  // include other fields that you expect in the response
+}
 
 
 function SignInForm() {
@@ -16,11 +23,44 @@ function SignInForm() {
     });
   };
 
-  const handleOnSubmit = (evt: { preventDefault: () => void; }) => {
+  const handleOnSubmit = async (evt: { preventDefault: () => void; }) => {
     evt.preventDefault();
 
     const { email, password } = state;
+
+     // Check if all fields are filled
+     if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+    
     alert(`You are login with email: ${email} and password: ${password}`);
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/login', {
+        email,
+        password,
+      });
+
+      alert(`${response.data.message}`);
+      
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const serverError = error as AxiosError; // Type assertion
+        if (serverError && serverError.response) {
+          // Ensure the data is of the expected type
+          const responseData = serverError.response.data as ServerResponse;
+          if (serverError.response.status === 404) {
+            alert(`${responseData.message}`);
+          } else {
+            alert(`${responseData.message}`);
+          }
+        }
+      } else {
+        // Handle non-Axios errors
+        alert(`An unknown error occurred`);
+      }
+    }
 
     for (const key in state) {
       setState({
