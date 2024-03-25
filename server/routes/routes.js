@@ -90,6 +90,16 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
 
 // post endpoint for register
 router.post("/register", (request, response) => {
+
+  const { email, password } = request.body;
+  
+   // Validate email and password
+   if (!email || !password) {
+    return response.status(400).send({
+      message: "Email and password are required",
+    });
+  }
+
     // ensure the email was not already registered
     User
         .findOne({ email: request.body.email })

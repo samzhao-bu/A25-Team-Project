@@ -27,6 +27,12 @@ function SignUpForm() {
     evt.preventDefault();
 
     const { name, email, password } = state;
+
+    // Check if all fields are filled
+    if (!name || !email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
     
     try {
       const response = await axios.post('http://localhost:3000/api/register', {
