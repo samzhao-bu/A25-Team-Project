@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
+import axios from "axios";
 function SignUpForm() {
   const [state, setState] = React.useState({
     name: "",
@@ -15,21 +16,31 @@ function SignUpForm() {
     });
   };
 
-  const handleOnSubmit = (evt: { preventDefault: () => void; }) => {
+  const handleOnSubmit = async (evt: { preventDefault: () => void; }) => {
     evt.preventDefault();
 
     const { name, email, password } = state;
-    alert(
-      `You are sign up with name: ${name} email: ${email} and password: ${password}`
-    );
+    
+    try {
+      const response = await axios.post('http://localhost:3000/api/register', {
+        name,
+        email,
+        password,
+      });
 
+      alert(`${response.data.message}`);
+    } catch(error) {
+      console.error('User registeration failed');
+    }
+
+    // Reset the form fields
     for (const key in state) {
       setState({
         ...state,
         [key]: ""
       });
     }
-  };
+};
 
   return (
     <div className="form-container sign-up-container">

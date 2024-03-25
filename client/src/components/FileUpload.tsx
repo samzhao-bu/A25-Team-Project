@@ -33,6 +33,7 @@ const FileUpload = () => {
                 setDownloadUrl(response.data.data.convertedFileUrl);
                 // change the state to show the button
                 setShowDownloadButton(true);
+                alert(`File converted successfully: ${response.data.message}`);
             } else {
             console.error('File conversion was unsuccessful.');
             }
