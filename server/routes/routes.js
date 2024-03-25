@@ -96,6 +96,7 @@ router.post("/register", (request, response) => {
       .then((hashedPassword) => {
         // create a new user instance and collect the data
         const user = new User({
+          name: request.body.name,
           email: request.body.email,
           password: hashedPassword,
         });
