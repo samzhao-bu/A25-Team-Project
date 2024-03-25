@@ -1,7 +1,14 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+
+interface ServerResponse {
+  message: string;
+  // include other fields that you expect in the response
+}
+
+
 function SignUpForm() {
   const [state, setState] = React.useState({
     name: "",
@@ -29,8 +36,23 @@ function SignUpForm() {
       });
 
       alert(`${response.data.message}`);
-    } catch(error) {
-      console.error('User registeration failed');
+      
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const serverError = error as AxiosError; // Type assertion
+        if (serverError && serverError.response) {
+          // Ensure the data is of the expected type
+          const responseData = serverError.response.data as ServerResponse;
+          if (serverError.response.status === 400) {
+            alert(`Failed to create user: ${responseData.message}`);
+          } else {
+            alert(`An error occurred: ${responseData.message}`);
+          }
+        }
+      } else {
+        // Handle non-Axios errors
+        alert(`An unknown error occurred`);
+      }
     }
 
     // Reset the form fields

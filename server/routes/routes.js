@@ -90,6 +90,15 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
 
 // post endpoint for register
 router.post("/register", (request, response) => {
+    // ensure the email was not already registered
+    User
+        .findOne({ email: request.body.email })
+        .then(user => {
+          if (user) {
+              return response.status(400).send({
+                  message: "Email already exists"
+              });
+          }
     // hash the password
     bcrypt
       .hash(request.body.password, 10)
@@ -113,12 +122,14 @@ router.post("/register", (request, response) => {
           })
           // catch error if the new user wasn't added successfully to the database
           .catch((error) => {
-            response.status(500).send({
+            response.status(200).send({
               message: "Error creating user",
               error,
             });
           });
       })
+
+    })
       // catch error if the password hash isn't successful
       .catch((e) => {
         response.status(500).send({
