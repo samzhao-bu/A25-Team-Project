@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // define the database struct
 // may add more later
-const dataShema = new mongoose.Schema({
+const dataSchema = new mongoose.Schema({
     originalName: {
         required: true,
         type: String
@@ -24,4 +24,4 @@ const dataShema = new mongoose.Schema({
 
 })
 
-module.exports = mongoose.model('Data', dataShema)
+module.exports = mongoose.model('Data', dataSchema)

@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 // import the model
 const Model = require('../model/model');
+// import model for user
+const User = require("../model/userModel");
 // import api for converting pdf-to-docx
 var convertapi = require('convertapi')('sqnUSLzN2sMxQu0v');
 // for handling file uploads
@@ -11,7 +13,15 @@ const multer = require('multer');
 const path = require('path');
 // for handling file delete
 const fs = require('fs');
+// for hashing hash the password
+const bcrypt = require("bcrypt");
+// for generating token
+const jwt = require("jsonwebtoken");
+const auth = require("./auth");
 
+const passport = require("passport");
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 
 
 // Configure multer
@@ -27,7 +37,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-//Post Method
+//Post Method for pdf-to-docx
 router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
     try {
 
@@ -39,7 +49,9 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
 
          // Perform the conversion
          
-         convertapi.convert('docx', {File: filePath}, 'pdf').then(async (result) => {
+         convertapi
+            .convert('docx', {File: filePath}, 'pdf')
+            .then(async (result) => {
             // ensure save the data to the database is executed only after the file conversion is complete and convertedFilePath is set
             const convertedFilePath = result.file.url;
 
@@ -78,6 +90,229 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
     }
     
 })
+
+
+// post endpoint for register
+router.post("/register", (request, response) => {
+
+  const { email, password } = request.body;
+  
+   // Validate email and password
+   if (!email || !password) {
+    return response.status(400).send({
+      message: "Email and password are required",
+    });
+  }
+
+    // ensure the email was not already registered
+    User
+        .findOne({ email: request.body.email })
+        .then(user => {
+          if (user) {
+              return response.status(400).send({
+                  message: "Email already exists"
+              });
+          }
+    // hash the password
+    bcrypt
+      .hash(request.body.password, 10)
+      .then((hashedPassword) => {
+        // create a new user instance and collect the data
+        const user = new User({
+          name: request.body.name,
+          email: request.body.email,
+          password: hashedPassword,
+        });
+  
+        // save the new user
+        user
+          .save()
+          // return success if the new user is added to the database successfully
+          .then((result) => {
+            response.status(200).send({
+              message: "User Created Successfully",
+              result,
+            });
+          })
+          // catch error if the new user wasn't added successfully to the database
+          .catch((error) => {
+            response.status(200).send({
+              message: "Error creating user",
+              error,
+            });
+          });
+      })
+
+    })
+      // catch error if the password hash isn't successful
+      .catch((e) => {
+        response.status(500).send({
+          message: "Password was not hashed successfully",
+          e,
+        });
+      });
+});
+
+
+// post endpoint for login
+router.post("/login", (request, response) => {
+    // check if email exists
+    User
+      .findOne({ email: request.body.email })
+      // if email exists
+      .then((user) => {
+        // compare the password entered and the hashed password found
+        bcrypt
+          .compare(request.body.password, user.password)
+  
+          // if the passwords match
+          .then((passwordCheck) => {
+  
+            // check if password matches
+            if(!passwordCheck) {
+              return response.status(400).send({
+                message: "Passwords does not match",
+                error,
+              });
+            }
+  
+            //   create JWT token
+            const token = jwt.sign(
+              {
+                userId: user._id,
+                userEmail: user.email,
+              },
+              process.env.JWT_TOKEN,
+              { expiresIn: "24h" }
+            );
+  
+            //   return success response
+            response.status(200).send({
+              message: "Login Successful",
+              email: user.email,
+              token,
+            });
+          })
+          // catch error if password does not match
+          .catch((error) => {
+            response.status(400).send({
+              message: "Passwords does not match",
+              error,
+            });
+          });
+      })
+      // catch error if email does not exist
+      .catch((e) => {
+        response.status(404).send({
+          message: "Email not found",
+          e,
+        });
+      });
+  });
+  
+
+// free endpoint
+router.get("/free-endpoint", (request, response) => {
+  response.json({ message: "You are free to access me anytime" });
+});
+
+// authentication endpoint
+router.get("/auth-endpoint", auth, (request, response) => {
+  response.json({ message: "You are authorized to access me" });
+});
+
+
+// Configure Passport to use Google OAuth
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/api/auth/google/callback"
+    },
+    async function(accessToken, refreshToken, profile, done) {
+      try {
+        let user = await User.findOne({ email: profile.emails[0].value });
+        if (!user) {
+          user = await User.create({
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            googleId: profile.id,
+            isGoogleAccount: true,
+          });
+        } else {
+          if (!user.googleId) {
+            user.googleId = profile.id;
+            user.isGoogleAccount = true;
+            await user.save();
+        } else {
+            user.isGoogleAccount = true;
+            await user.save();
+        }
+        done(null, user);
+        } 
+      }catch (err) {
+        done(err);
+      }
+    }
+  ));
+
+// Serialize and deserialize user instances to and from the session.
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
+
+router.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  }
+}));
+
+// Initialize Passport and restore authentication state, if any, from the session.
+router.use(passport.initialize())
+router.use(passport.session())
+
+// Route that initiates the Google OAuth flow
+router.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+)
+
+// Google OAuth callback route
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  (req, res) => {
+    // On successful authentication, create a JWT for the user
+    const token = jwt.sign(
+      {
+        userId: req.user._id,
+        userEmail: req.user.email,
+      },
+      process.env.JWT_TOKEN, 
+      { expiresIn: "24h" }
+    );
+
+    // Redirect to the frontend with the token
+    // passing tokens via URL parameters
+    // need to pass to auth
+    res.redirect(`http://localhost:5173/auth/?token=${token}`);
+  }
+);
+
 
 //Get all Method
 router.get('/getAll', (req, res) => {
