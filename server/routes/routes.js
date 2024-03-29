@@ -182,7 +182,7 @@ router.post("/login", (request, response) => {
                 userId: user._id,
                 userEmail: user.email,
               },
-              "RANDOM-TOKEN",
+              process.env.JWT_TOKEN,
               { expiresIn: "24h" }
             );
   
@@ -302,7 +302,7 @@ router.get(
         userId: req.user._id,
         userEmail: req.user.email,
       },
-      "RANDOM-TOKEN", 
+      process.env.JWT_TOKEN, 
       { expiresIn: "24h" }
     );
 
