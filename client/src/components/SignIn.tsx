@@ -1,12 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import axios, { AxiosError } from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 interface ServerResponse {
   message: string;
-  // include other fields that you expect in the response
 }
 
 
@@ -14,10 +13,30 @@ function SignInForm({ onAuthenticate }: { onAuthenticate: (isAuth: boolean) => v
 
   const navigate = useNavigate();
 
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      // Save the token in localStorage or context
+      localStorage.setItem('jwtToken', token);
+      // Update authentication state
+      onAuthenticate(true);
+      // Redirect user to home page
+      navigate('/'); 
+    }
+  }, [searchParams, navigate, onAuthenticate]);
+
   const [state, setState] = React.useState({
     email: "",
     password: ""
   });
+
+  const handleGoogleSignIn = () => {
+    window.location.href = 'http://localhost:3000/api/auth/google';
+  };
+
+
   const handleChange = (evt: { target: { value: any; name: any; }; }) => {
     const value = evt.target.value;
     setState({
@@ -86,7 +105,7 @@ function SignInForm({ onAuthenticate }: { onAuthenticate: (isAuth: boolean) => v
           <a href="#" className="social">
             <FontAwesomeIcon icon={faFacebookF} />
           </a>
-          <a href="#" className="social">
+          <a href="#" className="social" onClick={handleGoogleSignIn}>
             <FontAwesomeIcon icon={faGooglePlusG} />
           </a>
           <a href="#" className="social">

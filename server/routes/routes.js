@@ -19,6 +19,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("./auth");
 
+const passport = require("passport");
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
+
 
 // Configure multer
 const storage = multer.diskStorage({
@@ -218,6 +222,96 @@ router.get("/auth-endpoint", auth, (request, response) => {
 });
 
 
+// Configure Passport to use Google OAuth
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/api/auth/google/callback"
+    },
+    async function(accessToken, refreshToken, profile, done) {
+      try {
+        let user = await User.findOne({ email: profile.emails[0].value });
+        if (!user) {
+          user = await User.create({
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            googleId: profile.id,
+            isGoogleAccount: true,
+          });
+        } else {
+          if (!user.googleId) {
+            user.googleId = profile.id;
+            user.isGoogleAccount = true;
+            await user.save();
+        } else {
+            user.isGoogleAccount = true;
+            await user.save();
+        }
+        done(null, user);
+        } 
+      }catch (err) {
+        done(err);
+      }
+    }
+  ));
+
+// Serialize and deserialize user instances to and from the session.
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
+
+router.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  }
+}));
+
+// Initialize Passport and restore authentication state, if any, from the session.
+router.use(passport.initialize())
+router.use(passport.session())
+
+// Route that initiates the Google OAuth flow
+router.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+)
+
+// Google OAuth callback route
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  (req, res) => {
+    // On successful authentication, create a JWT for the user
+    const token = jwt.sign(
+      {
+        userId: req.user._id,
+        userEmail: req.user.email,
+      },
+      "RANDOM-TOKEN", 
+      { expiresIn: "24h" }
+    );
+
+    // Redirect to the frontend with the token
+    // passing tokens via URL parameters
+    // need to pass to auth
+    res.redirect(`http://localhost:5173/auth/?token=${token}`);
+  }
+);
 
 
 //Get all Method

@@ -5,7 +5,6 @@ import axios, { AxiosError } from "axios";
 
 interface ServerResponse {
   message: string;
-  // include other fields that you expect in the response
 }
 
 
@@ -21,6 +20,10 @@ function SignUpForm() {
       ...state,
       [evt.target.name]: value
     });
+  };
+
+  const handleGoogleSignIn = () => {
+    window.location.href = 'http://localhost:3000/api/auth/google';
   };
 
   const handleOnSubmit = async (evt: { preventDefault: () => void; }) => {
@@ -78,8 +81,8 @@ function SignUpForm() {
         <a href="#" className="social">
             <FontAwesomeIcon icon={faFacebookF} />
           </a>
-          <a href="#" className="social">
-            <FontAwesomeIcon icon={faGooglePlusG} />
+          <a href="#" className="social" onClick={handleGoogleSignIn}>
+            <FontAwesomeIcon icon={faGooglePlusG }/>
           </a>
           <a href="#" className="social">
             <FontAwesomeIcon icon={faLinkedinIn} />
