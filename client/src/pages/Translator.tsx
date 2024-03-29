@@ -1,11 +1,17 @@
 // import React from "react";
+import React from 'react';
+import Translater from '../components/Translater'; 
 
-const Translator = () => {
+const Translator: React.FC = () => {
+    // FileUpload component contains all the logic
     return (
         <div>
-            <h1>translator.</h1>
+            <h2>Translate files</h2>
+        
+            <Translater />
+        
         </div>
     );
 };
-
+    
 export default Translator;

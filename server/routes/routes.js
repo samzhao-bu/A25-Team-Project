@@ -23,6 +23,11 @@ const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 
+const deepl = require('deepl-node');
+const authKey = process.env['DEEPL_AUTH_KEY'];
+const serverUrl = process.env['DEEPL_SERVER_URL'];
+const translator = new deepl.Translator(authKey, { serverUrl: serverUrl });
+
 
 // Configure multer
 const storage = multer.diskStorage({
@@ -36,6 +41,45 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router.post('/dltranslater', upload.single('file'), async (req, res) => {
+  try {
+  if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+  }
+  const filePath = req.file.path;
+  const translatedFilePath = path.join(__dirname, '../downloads', `translated-${req.file.filename}`);
+  const targetLang = req.body.targetLang;
+  await translator.translateDocument(
+    req.file.path,
+    translatedFilePath,
+    null,
+    targetLang,
+);
+const filename = path.basename(translatedFilePath);
+// const downloadUrl = `${req.protocol}://${req.get('host')}/downloads/${path.basename(translatedFilePath)}`;
+res.setHeader('Content-Disposition', 'attachment; filename=' + filename);
+const readStream = fs.createReadStream(translatedFilePath);
+readStream.pipe(res);
+fs.unlink(filePath, (err) => { 
+  if (err) {
+      console.error('Error deleting the uploaded file:', err);
+  } else {
+       console.log('Uploaded file deleted successfully');
+  }
+});
+fs.unlink(translatedFilePath, (err) => {
+  if (err) {
+    console.error('Error deleting the uploaded file:', err);
+  } else {
+     console.log('Downloaded file deleted successfully');
+  }
+});      
+
+}catch (error) {
+  console.error(error);
+  res.status(500).send('Error during conversion');
+}
+})
 
 //Post Method for pdf-to-docx
 router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
