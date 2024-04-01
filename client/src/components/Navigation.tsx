@@ -17,9 +17,13 @@ function Navigation() {
       <NavLink to="/translator" className={({ isActive }) => isActive ? "active" : ""}>
         File Translator
       </NavLink>
+      <NavLink to="/summary" className={({ isActive }) => isActive ? "active" : ""}>
+        File Summary
+      </NavLink>
       <NavLink to="/user" className={({ isActive }) => isActive ? "active" : ""}>
         User
       </NavLink>
+      
     </div>
   );
 }

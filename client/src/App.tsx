@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Fileconvert from "./pages/Fileconvert";
 import Translator from "./pages/Translator";
+import Summary from "./pages/Filesummary";
 import User from "./pages/User";
 import Authpage from "./pages/Authpage";
 import Navigation from "./components/Navigation";
@@ -36,6 +37,7 @@ function App() {
                     <Route path="/auth" element={<Authpage onAuthenticate={handleAuthentication}/>} />
                     <Route path="/fileconvert" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Fileconvert /></ProtectedRoute>} />
                     <Route path="/translator" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Translator /></ProtectedRoute>} />
+                    <Route path="/summary" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Summary /></ProtectedRoute>} />
                     <Route path="/user" element={<ProtectedRoute isAuthenticated={isAuthenticated}><User /></ProtectedRoute>} />
                 </Routes>
             </div>

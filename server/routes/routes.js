@@ -360,81 +360,124 @@ router.get(
 );
 
 
-// Function to make a request to the text analysis API
+// Function to analyze text
 const analyzeText = (filePath, callback) => {
   const options = {
-      method: 'POST',
-      url: 'https://text-analysis12.p.rapidapi.com/text-mining/api/v1.1',
-      headers: {
-          'content-type': 'multipart/form-data; boundary=---011000010111000001101001',
-          'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-          'X-RapidAPI-Host': process.env.RAPID_API_HOST
-      },
-      formData: {
-          input_file: fs.createReadStream(filePath),
-          language: 'english'
-      }
+    method: 'POST',
+    url: 'https://text-analysis12.p.rapidapi.com/text-mining/api/v1.1',
+    headers: {
+      'content-type': 'multipart/form-data; boundary=---011000010111000001101001',
+      'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+      'X-RapidAPI-Host': process.env.RAPID_API_HOST
+    },
+    formData: {
+      input_file: fs.createReadStream(filePath),
+      language: 'english'
+    }
   };
 
   request(options, callback);
 };
 
-// Post Method for text analysis
+// Function to summarize text
+const summarizeText = (textExtractionOutput, callback) => {
+  const options = {
+    method: 'POST',
+    url: 'https://text-analysis12.p.rapidapi.com/summarize-text/api/v1.1',
+    headers: {
+      'content-type': 'application/json',
+      'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+      'X-RapidAPI-Host': process.env.RAPID_API_HOST
+    },
+    body: {
+      language: 'english',
+      summary_percent: 10,
+      text: textExtractionOutput
+    },
+    json: true
+  }; 
+
+  request(options, callback);
+};
+
+// Function to save text to file
+const saveTextToFile = (text, callback) => {
+  const fileName = `summary_${Date.now()}.txt`;
+  const filePath = path.join(__dirname, '..', 'downloads', fileName);
+
+  fs.writeFile(filePath, text, (err) => {
+    if (err) callback(err, null);
+    else callback(null, filePath);
+  });
+
+   // clean download file after 60s
+      
+   setTimeout(() => {
+     fs.unlink(filePath, (err) => {
+         if (err) {
+             console.error("Error deleting file:", filePath, err);
+         } else {
+             console.log("File deleted successfully:", filePath);
+         }
+     });
+ }, 6000);
+};
+
+// POST Method for text analysis and summarization
 router.post('/text-analysis', upload.single('file'), async (req, res) => {
   try {
-      if (!req.file) {
-          return res.status(400).send('No file uploaded.');
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+    }
+
+    const filePath = req.file.path;
+
+    analyzeText(filePath, async (error, response, body) => {
+      if (error) {
+        return res.status(500).send('Error during text analysis');
       }
 
-      const filePath = req.file.path;
+      // the text extracted from analyzeText
+      const parsedBody = JSON.parse(body);
+      const textExtractionOutput = parsedBody.text;
 
-      // Perform text analysis
-      analyzeText(filePath, (error, response, body) => {
-          if (error) {
-              return res.status(500).send('Error during text analysis');
+      await summarizeText(textExtractionOutput, async (summarizationError, summaryResponse, summaryBody) => {
+        if (summarizationError) {
+          return res.status(500).send('Error during text summarization');
+        }
+
+        //console.log('Summary body:', summaryBody.summary);
+
+        await saveTextToFile(summaryBody.summary, (fileSaveError, savedFilePath) => {
+          if (fileSaveError) {
+            return res.status(500).send('Error saving the file');
           }
 
-          // Once analysis is done, delete the uploaded file
-          fs.unlink(filePath, (err) => {
-              if (err) {
-                  console.error('Error deleting the uploaded file:', err);
-              } else {
-                  console.log('Uploaded file deleted successfully');
-              }
-          });
+          const downloadUrl = `${req.protocol}://${req.get('host')}/downloads/${path.basename(savedFilePath)}`;
+          res.status(200).send({ downloadUrl });
+        });
+      });
 
-          // Send the response to the frontend
-          //res.status(response.statusCode).send(body);
+      // clean uploaded file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error('Error deleting the uploaded file:', err);
+        } else {
+          console.log('Uploaded file deleted successfully');
+        }
+      });
 
-          const textExtractionOutput = body; // Replace this with your actual extracted text
+     
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error during text analysis');
+  }
+});
 
-          const options = {
-            method: 'POST',
-            url: 'https://text-analysis12.p.rapidapi.com/summarize-text/api/v1.1',
-            headers: {
-              'content-type': 'application/json',
-              'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-              'X-RapidAPI-Host': process.env.RAPID_API_HOST
-            },
-            body: {
-              language: 'english',
-              summary_percent: 10,
-              text: textExtractionOutput // Use the extracted text here
-            },
-            json: true
-          };
 
-          request(options, function (error, response, body) {
-            if (error) throw new Error(error);
-
-            res.status(response.statusCode).send(body);;
-          });
-                });
-            } catch (error) {
-                console.error(error);
-                res.status(500).send('Error during text analysis');
-            }
-          });
-
+router.use('*', (req, res) => {
+  res.redirect('/'); // Redirect user to the homepage
+});
 
 module.exports = router;
