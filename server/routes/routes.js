@@ -31,7 +31,6 @@ const translator = new deepl.Translator(authKey, { serverUrl: serverUrl });
 const request = require('request');
 
 
-
 // Configure multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -368,8 +367,8 @@ const analyzeText = (filePath, callback) => {
       url: 'https://text-analysis12.p.rapidapi.com/text-mining/api/v1.1',
       headers: {
           'content-type': 'multipart/form-data; boundary=---011000010111000001101001',
-          'X-RapidAPI-Key': '3e189d719dmsh84d5f6776b5d9fep1eaceejsn42b7fc9339aa',
-          'X-RapidAPI-Host': 'text-analysis12.p.rapidapi.com'
+          'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+          'X-RapidAPI-Host': process.env.RAPID_API_HOST
       },
       formData: {
           input_file: fs.createReadStream(filePath),
