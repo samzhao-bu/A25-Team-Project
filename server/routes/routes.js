@@ -6,7 +6,7 @@ const Model = require('../model/model');
 // import model for user
 const User = require("../model/userModel");
 // import api for converting pdf-to-docx
-var convertapi = require('convertapi')('sqnUSLzN2sMxQu0v');
+var convertapi = require('convertapi')(process.env.COVERT_API_TOKEN);
 // for handling file uploads
 const multer = require('multer');
 // for handling file dir
