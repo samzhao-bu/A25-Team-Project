@@ -23,6 +23,9 @@ const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 
+const request = require('request');
+
+
 
 // Configure multer
 const storage = multer.diskStorage({
@@ -314,28 +317,57 @@ router.get(
 );
 
 
-//Get all Method
-router.get('/getAll', (req, res) => {
-    res.send('Get All API')
-})
+// Function to make a request to the text analysis API
+const analyzeText = (filePath, callback) => {
+  const options = {
+      method: 'POST',
+      url: 'https://text-analysis12.p.rapidapi.com/text-mining/api/v1.1',
+      headers: {
+          'content-type': 'multipart/form-data; boundary=---011000010111000001101001',
+          'X-RapidAPI-Key': '3e189d719dmsh84d5f6776b5d9fep1eaceejsn42b7fc9339aa',
+          'X-RapidAPI-Host': 'text-analysis12.p.rapidapi.com'
+      },
+      formData: {
+          input_file: fs.createReadStream(filePath),
+          language: 'english'
+      }
+  };
 
-//Get by ID Method
-router.get('/getOne/:id', (req, res) => {
-    res.send('Get by ID API')
-})
+  request(options, callback);
+};
 
-//Update by ID Method
-router.patch('/update/:id', (req, res) => {
-    res.send('Update by ID API')
-})
+// Post Method for text analysis
+router.post('/text-analysis', upload.single('file'), async (req, res) => {
+  try {
+      if (!req.file) {
+          return res.status(400).send('No file uploaded.');
+      }
 
-//Delete by ID Method
-router.delete('/delete/:id', (req, res) => {
-    res.send('Delete by ID API')
-})
+      const filePath = req.file.path;
 
-router.get('/test', (req, res) => {
-    res.send('Test route is working');
-  });
+      // Perform text analysis
+      analyzeText(filePath, (error, response, body) => {
+          if (error) {
+              return res.status(500).send('Error during text analysis');
+          }
+
+          // Once analysis is done, delete the uploaded file
+          fs.unlink(filePath, (err) => {
+              if (err) {
+                  console.error('Error deleting the uploaded file:', err);
+              } else {
+                  console.log('Uploaded file deleted successfully');
+              }
+          });
+
+          // Send the response to the frontend
+          res.status(response.statusCode).send(body);
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error during text analysis');
+  }
+});
+
 
 module.exports = router;
