@@ -404,13 +404,37 @@ router.post('/text-analysis', upload.single('file'), async (req, res) => {
           });
 
           // Send the response to the frontend
-          res.status(response.statusCode).send(body);
-      });
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Error during text analysis');
-  }
-});
+          //res.status(response.statusCode).send(body);
+
+          const textExtractionOutput = body; // Replace this with your actual extracted text
+
+          const options = {
+            method: 'POST',
+            url: 'https://text-analysis12.p.rapidapi.com/summarize-text/api/v1.1',
+            headers: {
+              'content-type': 'application/json',
+              'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+              'X-RapidAPI-Host': process.env.RAPID_API_HOST
+            },
+            body: {
+              language: 'english',
+              summary_percent: 10,
+              text: textExtractionOutput // Use the extracted text here
+            },
+            json: true
+          };
+
+          request(options, function (error, response, body) {
+            if (error) throw new Error(error);
+
+            res.status(response.statusCode).send(body);;
+          });
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send('Error during text analysis');
+            }
+          });
 
 
 module.exports = router;
