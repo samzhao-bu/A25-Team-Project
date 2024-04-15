@@ -4,7 +4,7 @@ import "./styles/style.css"
 
 import { useState} from 'react';
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route,Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Fileconvert from "./pages/Fileconvert";
 import Translator from "./pages/Translator";
@@ -31,14 +31,14 @@ function App() {
                 {/*can see the nav bar iff the user is authenticated */}
                 {isAuthenticated && <Navigation />}
                 <Routes>
-                    {/*if not authenticated, will force to go back to authpage */}
                     <Route path="/" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Dashboard /></ProtectedRoute>} />
-                    {/*pass in the func */}
-                    <Route path="/auth" element={<Authpage onAuthenticate={handleAuthentication}/>} />
+                    { !isAuthenticated && <Route path="/auth" element={<Authpage onAuthenticate={handleAuthentication}/>} /> }
                     <Route path="/fileconvert" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Fileconvert /></ProtectedRoute>} />
                     <Route path="/translator" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Translator /></ProtectedRoute>} />
                     <Route path="/summary" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Summary /></ProtectedRoute>} />
-                    <Route path="/user" element={<ProtectedRoute isAuthenticated={isAuthenticated}><User /></ProtectedRoute>} />
+                    <Route path="/user" element={<ProtectedRoute isAuthenticated={isAuthenticated} ><User /></ProtectedRoute>} />
+                    {/* Redirect any other route to Dashboard or Auth */}
+                    <Route path="*" element={isAuthenticated ? <Navigate to="/" /> : <Navigate to="/auth" />} />
                 </Routes>
             </div>
         </Router>

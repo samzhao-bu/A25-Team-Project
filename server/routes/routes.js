@@ -83,13 +83,17 @@ fs.unlink(translatedFilePath, (err) => {
 }
 })
 
-//Post Method for pdf-to-docx
+//Post Method for pdf-to-docx--------------------------------------------------------------------------------
 router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
     try {
 
         if (!req.file) {
             return res.status(400).send('No file uploaded.');
         }
+
+        // if (!req.user) {
+        //   return res.status(401).json({ message: 'Not authenticated' });
+        // }
 
         const filePath = req.file.path;
 
@@ -103,6 +107,7 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
 
             // Save to database
             const data = new Model({
+                // userId: req.user._id,
                 originalName: req.file.originalname,
                 originalFormat: 'pdf',
                 convertedFormat: 'docx',
@@ -138,7 +143,7 @@ router.post('/pdf-to-docx', upload.single('file'), async (req, res) => {
 })
 
 
-// post endpoint for register
+// post endpoint for register-----------------------------------------------------------------------------------------------
 router.post("/register", (request, response) => {
 
   const { email, password } = request.body;
@@ -200,7 +205,7 @@ router.post("/register", (request, response) => {
 });
 
 
-// post endpoint for login
+// post endpoint for login-------------------------------------------------------------------------------------------------
 router.post("/login", (request, response) => {
     // check if email exists
     User
@@ -257,18 +262,18 @@ router.post("/login", (request, response) => {
   });
   
 
-// free endpoint
-router.get("/free-endpoint", (request, response) => {
-  response.json({ message: "You are free to access me anytime" });
-});
+// // free endpoint
+// router.get("/free-endpoint", (request, response) => {
+//   response.json({ message: "You are free to access me anytime" });
+// });
 
-// authentication endpoint
-router.get("/auth-endpoint", auth, (request, response) => {
-  response.json({ message: "You are authorized to access me" });
-});
+// // authentication endpoint
+// router.get("/auth-endpoint", auth, (request, response) => {
+//   response.json({ message: "You are authorized to access me" });
+// });
 
 
-// Configure Passport to use Google OAuth
+// Configure Passport to use Google OAuth-------------------------------------------------------------------------------
 passport.use(
   new GoogleStrategy(
     {
@@ -360,7 +365,7 @@ router.get(
 );
 
 
-// Function to analyze text
+// Function to analyze text---------------------------------------------------------------------------------------------------
 const analyzeText = (filePath, callback) => {
   const options = {
     method: 'POST',
@@ -423,7 +428,7 @@ const saveTextToFile = (text, callback) => {
  }, 6000);
 };
 
-// POST Method for text analysis and summarization
+// POST Method for text analysis and summarization------------------------------------------------------------------------------
 router.post('/text-analysis', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
