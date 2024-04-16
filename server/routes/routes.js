@@ -485,4 +485,31 @@ router.use('*', (req, res) => {
   res.redirect('/'); // Redirect user to the homepage
 });
 
+const authenticateWithJWT = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Assuming the token is sent as a Bearer token
+  if (!token) {
+      return res.status(401).send('No token provided');
+  }
+
+  jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
+      if (err) {
+          return res.status(401).send('Invalid token');
+      }
+      req.user = decoded; // Set the decoded user to req.user
+      next();
+  });
+};
+
+// Endpoint to get user name using JWT
+router.get('/get-user-name', authenticateWithJWT, (req, res) => {
+  if (req.user) {
+      res.json({ name: req.user.name });
+  } else {
+      res.status(404).send('User not found');
+  }
+});
+
+
+
+
 module.exports = router;
