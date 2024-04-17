@@ -481,9 +481,9 @@ router.post('/text-analysis', upload.single('file'), async (req, res) => {
 });
 
 
-router.use('*', (req, res) => {
-  res.redirect('/'); // Redirect user to the homepage
-});
+// router.use('*', (req, res) => {
+//   res.redirect('/'); // Redirect user to the homepage
+// });
 
 const authenticateWithJWT = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1]; // Assuming the token is sent as a Bearer token
@@ -496,17 +496,32 @@ const authenticateWithJWT = (req, res, next) => {
           return res.status(401).send('Invalid token');
       }
       req.user = decoded; // Set the decoded user to req.user
+      console.log(req.user)
       next();
   });
 };
 
 // Endpoint to get user name using JWT
-router.get('/get-user-name', authenticateWithJWT, (req, res) => {
+router.get('/get-user-name', authenticateWithJWT, async(req, res) => {
   if (req.user) {
-      res.json({ name: req.user.name });
-  } else {
+    const userId = req.user.userId; // Get the user ID from the decoded token
+
+    // Query the database to find the user by ID
+    const user = await User.findById(userId);
+
+    if (user) {
+      res.json({ name: user.name }); 
+    } else {
       res.status(404).send('User not found');
+    }
+  } else {
+    res.status(401).send('Unauthorized');
   }
+});
+
+
+router.get('/test', (req, res) => {
+  res.send('Test endpoint');
 });
 
 

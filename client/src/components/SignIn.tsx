@@ -66,6 +66,11 @@ function SignInForm({ onAuthenticate }: { onAuthenticate: (isAuth: boolean) => v
 
       alert(`${response.data.message}`);
 
+      const token :string= response.data.token
+      // save into local storage
+      localStorage.setItem('jwtToken', token);
+
+
       // set authenticated state to true used the func in arg
       onAuthenticate(true);
       // navigate to homepage

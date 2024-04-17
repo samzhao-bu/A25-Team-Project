@@ -9,12 +9,14 @@ const User = () => {
     useEffect(() => {
         const fetchUserName = async () => {
             try {
+                //const jwtToken :string = import.meta.env.JWT_TOKEN
                 const response = await axios.get('http://localhost:3000/api/get-user-name', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` // Ensure the token is stored in localStorage
+                        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
                     }
                 });
                 setUserName(response.data.name);
+                console.log(response)
             } catch (error) {
                 console.error('Failed to fetch user name:', error);
                 // Handle errors, e.g., by redirecting to login if unauthorized
