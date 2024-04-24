@@ -4,7 +4,7 @@ import FileSummary from '../components/FileSummary';
 const Summary = () => {
     return (
         <div>
-            <h2>File summary.</h2>
+            <h2>Summarize files</h2>
 
             <FileSummary />
         </div>

@@ -107,14 +107,14 @@ function SignInForm({ onAuthenticate }: { onAuthenticate: (isAuth: boolean) => v
       <form onSubmit={handleOnSubmit}>
         <h1>Sign in</h1>
         <div className="social-container">
-          <a href="#" className="social">
+          {/* <a href="#" className="social">
             <FontAwesomeIcon icon={faFacebookF} />
-          </a>
+          </a> */}
           <a href="#" className="social" onClick={handleGoogleSignIn}>
             <FontAwesomeIcon icon={faGooglePlusG} />
-          </a>
+          {/* </a>
           <a href="#" className="social">
-            <FontAwesomeIcon icon={faLinkedinIn} />
+            <FontAwesomeIcon icon={faLinkedinIn} /> */}
           </a>
         </div>
         <span>or use your account</span>

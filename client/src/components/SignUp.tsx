@@ -78,15 +78,15 @@ function SignUpForm() {
       <form onSubmit={handleOnSubmit}>
         <h1>Create Account</h1>
         <div className="social-container">
-        <a href="#" className="social">
+        {/* <a href="#" className="social">
             <FontAwesomeIcon icon={faFacebookF} />
-          </a>
+          </a> */}
           <a href="#" className="social" onClick={handleGoogleSignIn}>
             <FontAwesomeIcon icon={faGooglePlusG }/>
           </a>
-          <a href="#" className="social">
+          {/* <a href="#" className="social">
             <FontAwesomeIcon icon={faLinkedinIn} />
-          </a>
+          </a> */}
         </div>
         <span>or use your email for registration</span>
         <input
